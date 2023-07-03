@@ -1,5 +1,4 @@
-﻿using BCrpytTest.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -7,31 +6,47 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BCrpytTest.Controllers
+namespace BCryptNetTest.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
-
-        public IActionResult Index()
+        public ActionResult Index()
         {
             return View();
         }
 
-        public IActionResult Privacy()
+        [HttpPost]
+        public ActionResult Encrypt(string text)
         {
-            return View();
+            // Şifreleme işlemi
+            string encryptedText = BCrypt.Net.BCrypt.HashPassword(text);
+
+            // Şifrelenmiş metni view'e iletmek için ViewBag kullanabilirsiniz
+            ViewBag.EncryptedText = encryptedText;
+
+            return View("Index");
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        [HttpPost]
+        public ActionResult Decrypt(string encryptedText)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            // Şifrelenmiş metni doğrulama işlemi
+            bool isMatch = BCrypt.Net.BCrypt.Verify(encryptedText, encryptedText);
+
+            string decryptedText;
+            if (isMatch)
+            {
+                decryptedText = "Şifre doğrulandı.";
+            }
+            else
+            {
+                decryptedText = "Şifre doğrulanmadı.";
+            }
+
+            // Çözülen metni view'e iletmek için ViewBag kullanabilirsiniz
+            ViewBag.DecryptedText = decryptedText;
+
+            return View("Index");
         }
     }
 }

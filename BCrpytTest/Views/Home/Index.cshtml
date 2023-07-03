@@ -1,8 +1,78 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewBag.Title = "Şifreleme Örneği";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<h2>Metin Şifreleme</h2>
+
+@using (Html.BeginForm("Encrypt", "Home", FormMethod.Post))
+{
+    <div>
+        @Html.Label("Metin:")
+        <br />
+        @Html.TextBox("text")
+    </div>
+
+    <br />
+
+    <input type="submit" value="Şifrele" />
+
+    <br />
+
+    @if (!string.IsNullOrEmpty(ViewBag.EncryptedText))
+    {
+        <div>
+            <br />
+            @Html.Label("Şifrelenmiş Metin:")
+            <br />
+            @Html.TextBox("encryptedText", (string)ViewBag.EncryptedText, new { @readonly = "readonly" })
+        </div>
+    }
+
+    <br />
+
+    <div>
+        @Html.Label("Şifrelenmiş Metni Oku:")
+        <br />
+        @Html.TextBox("decryptedText")
+        <br />
+        <input type="button" value="Çöz" onclick="decryptText()" />
+    </div>
+
+    <br />
+
+    @if (!string.IsNullOrEmpty(ViewBag.DecryptedText))
+    {
+        <div>
+            <br />
+            @Html.Label("Çözülen Metin:")
+            <br />
+            @Html.TextBox("decryptedResult", (string)ViewBag.DecryptedText, new { @readonly = "readonly" })
+        </div>
+
+        <br />
+
+        <div>
+            @Html.Label("Çözülen Metni Yazdır:")
+            <br />
+            @Html.TextBox("printedDecryptedResult", (string)ViewBag.DecryptedText, new { @readonly = "readonly" })
+        </div>
+    }
+}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    function decryptText() {
+        var encryptedText = document.getElementById("decryptedText").value;
+
+        // Şifrelenmiş metni sunucuya göndermek için AJAX kullanabilirsiniz
+        $.ajax({
+            url: '/Home/Decrypt',
+            type: 'POST',
+            data: { encryptedText: encryptedText },
+            success: function (response) {
+                document.getElementById("decryptedResult").value = response;
+                document.getElementById("printedDecryptedResult").value = response;
+            }
+        });
+    }
+</script>
